@@ -11,12 +11,26 @@ import {IERC165} from "@openzeppelin/contracts/interfaces/IERC165.sol";
 import {IERC721Metadata} from "@openzeppelin/contracts/interfaces/IERC721Metadata.sol";
 import {ERC721Holder} from "@openzeppelin/contracts/token/ERC721/utils/ERC721Holder.sol";
 
+
+//   _____ ______   ____  __  _    ___  ____  
+//  / ___/|      | /    ||  |/ ]  /  _]|    \ 
+// (   \_ |      ||  o  ||  ' /  /  [_ |  D  )
+//  \__  ||_|  |_||     ||    \ |    _]|    / 
+//  /  \ |  |  |  |  _  ||     \|   [_ |    \ 
+//  \    |  |  |  |  |  ||  .  ||     ||  .  \
+//   \___|  |__|  |__|__||__|\_||_____||__|\_|
+                                           
 contract Staker is ERC4883Composer, Colours, ERC721Holder {
     /// ERRORS
 
     /// EVENTS
 
-    constructor() ERC4883Composer("Staker", "STK", 0.00042 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 99, 4883) {}
+    constructor()
+        ERC4883Composer("Staker", "STK", 0.00042 ether, 0xeB10511109053787b3ED6cc02d5Cb67A265806cC, 99, 4883)
+    {}
+
+    string[] executionLayerClients = ["Besu", "Erigon", "Geth", "Nethermind"];
+    string[] consensusLayerClients = ["Lighthouse", "Lodestar", "Nimbus", "Prysm", "Teku"];
 
     function colourId(uint256 tokenId) public view returns (uint8) {
         if (!_exists(tokenId)) {
@@ -30,12 +44,16 @@ contract Staker is ERC4883Composer, Colours, ERC721Holder {
         return string.concat(
             "Staker.  Staker #",
             Strings.toString(tokenId),
-            ".  ERC4883 composable NFT.  Staker emoji designed by OpenMoji (the open-source emoji and icon project). License: CC BY-SA 4.0"
+            ".  ERC4883 composable NFT.  Staker mascot inspired by Proteus node"
         );
     }
 
     function _generateAttributes(uint256 tokenId) internal view virtual override returns (string memory) {
         string memory attributes = string.concat(
+            '{"trait_type": "Execution Client", "value": "',
+            _generateExecutionLayerClient(tokenId),
+            '"}, {"trait_type": "Consensus Client", "value": "',
+            _generateConsensusLayerClient(tokenId),
             '{"trait_type": "Colour", "value": "',
             _generateColour(tokenId),
             '"}',
@@ -64,12 +82,14 @@ contract Staker is ERC4883Composer, Colours, ERC721Holder {
         return string.concat(
             '<g id="Staker-',
             Strings.toString(tokenId),
-            '">' "<desc>Staker</desc>" '<path fill="',
+            '">' "<desc>Staker mascot inspired by Proteus node</desc>"
+            '<g stroke="black" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="',
             colourValue,
-            '" stroke="none" d="M48.611 166.667c0 31.271 10.333 60.132 27.778 83.347l-0.042 0.021C58.931 273.243 48.611 302.083 48.611 333.333c39.903 -6.667 71.507 -31.917 80.653 -64.188l0.049 -0.042C146.215 305.924 210.938 333.333 288.194 333.333C378.326 333.333 451.389 296.021 451.389 250S378.326 166.667 288.194 166.667c-77.271 0 -142 27.424 -158.896 64.25l0.063 0.028C120.465 198.917 89.458 173.736 50.132 166.667" stroke-width="6.944444444444445"/>'
-            '<path fill="none" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="13.88888888888889" d="M48.611 166.667c0 31.271 10.333 60.132 27.778 83.347l-0.042 0.021C58.931 273.243 48.611 302.083 48.611 333.333c39.903 -6.667 71.507 -31.917 80.653 -64.188l0.049 -0.042C146.215 305.924 210.938 333.333 288.194 333.333C378.326 333.333 451.389 296.021 451.389 250S378.326 166.667 288.194 166.667c-77.271 0 -142 27.424 -158.896 64.25l0.063 0.028C120.465 198.917 89.458 173.736 50.132 166.667"/>'
-            '<path cx="53" cy="34" r="2" fill="#000000" stroke="none" d="M381.944 236.111A13.889 13.889 0 0 1 368.056 250A13.889 13.889 0 0 1 354.167 236.111A13.889 13.889 0 0 1 381.944 236.111z" stroke-width="6.944444444444445"/>'
-            "</g>"
+            '">' '<rect x="91" y="319" width="313" height="98" />' '<rect x="91" y="277" width="313" height="54" />'
+            '<rect x="91" y="84" width="313" height="193" />' '<line x1="223" y1="386" x2="364" y2="386" />'
+            '<path d="M303 328C303 334.168 297.844 341.367 285.814 347.382C274.143 353.218 257.6 357 239 357C220.4 357 203.857 353.218 192.186 347.382C180.156 341.367 175 334.168 175 328C175 321.832 180.156 314.633 192.186 308.618C203.857 302.782 220.4 299 239 299C257.6 299 274.143 302.782 285.814 308.618C297.844 314.633 303 321.832 303 328Z" />'
+            "</g>" '<ellipse cx="188.5" cy="250.5" rx="15.5" ry="14.5" fill="grey"/>'
+            '<ellipse cx="302.5" cy="249.5" rx="15.5" ry="14.5" fill="grey"/>' "</g>"
         );
     }
 
@@ -78,8 +98,28 @@ contract Staker is ERC4883Composer, Colours, ERC721Holder {
         return uint8(id % colours.length);
     }
 
+    function _generateConsensusLayerClientId(uint256 tokenId) internal view returns (uint8) {
+        uint256 id =
+            uint256(keccak256(abi.encodePacked("Consensus Layer Client", address(this), Strings.toString(tokenId))));
+        return uint8(id % consensusLayerClients.length);
+    }
+
+    function _generateExecutionLayerClientId(uint256 tokenId) internal view returns (uint8) {
+        uint256 id =
+            uint256(keccak256(abi.encodePacked("Execution Layer Client", address(this), Strings.toString(tokenId))));
+        return uint8(id % executionLayerClients.length);
+    }
+
     function _generateColour(uint256 tokenId) internal view returns (string memory) {
         return colours[_generateColourId(tokenId)];
+    }
+
+    function _generateConsensusLayerClient(uint256 tokenId) internal view returns (string memory) {
+        return consensusLayerClients[_generateConsensusLayerClientId(tokenId)];
+    }
+
+    function _generateExecutionLayerClient(uint256 tokenId) internal view returns (string memory) {
+        return executionLayerClients[_generateExecutionLayerClientId(tokenId)];
     }
 
     function _generateTokenName(uint256 tokenId) internal view virtual override returns (string memory) {
