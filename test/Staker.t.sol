@@ -19,8 +19,8 @@ contract StakerTest is Test, ERC721Holder {
     MockERC4883 public accessory4;
 
     string public constant NAME = "Staker";
-    string public constant SYMBOL = "FSH";
-    uint256 public constant OWNER_ALLOCATION = 200;
+    string public constant SYMBOL = "STK";
+    uint256 public constant OWNER_ALLOCATION = 99;
     uint256 public constant SUPPLY_CAP = 4883; // https://eips.ethereum.org/EIPS/eip-4883/
     uint256 constant PRICE = 0.00042 ether;
     address constant OWNER = 0xeB10511109053787b3ED6cc02d5Cb67A265806cC;
